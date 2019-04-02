@@ -11,6 +11,7 @@ use Kdyby;
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\Model\Translatable\Translation;
 use Knp\DoctrineBehaviors\ORM\Translatable\TranslatableSubscriber;
+use Nette\DI\Config\Helpers;
 use Nette\Utils\AssertionException;
 use Nette\Utils\Validators;
 use Zenify\DoctrineBehaviors\Entities\Attributes\Translatable;
@@ -37,13 +38,14 @@ final class TranslatableExtension extends AbstractBehaviorExtension
 	 */
 	public function loadConfiguration()
 	{
-		$config = $this->getConfig($this->default);
+		$config = Helpers::merge($this->getConfig(), $this->default);
 		$this->validateConfigTypes($config);
 		$builder = $this->getContainerBuilder();
 
 		$builder->addDefinition($this->prefix('listener'))
-			->setClass(TranslatableSubscriber::class, [
-				'@' . $this->getClassAnalyzer()->getClass(),
+			->setType(TranslatableSubscriber::class)
+			->setArguments([
+				'@' . $this->getClassAnalyzer()->getType(),
 				$config['currentLocaleCallable'],
 				$config['defaultLocaleCallable'],
 				$config['translatableTrait'],

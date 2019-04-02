@@ -11,14 +11,13 @@ use Knp\DoctrineBehaviors\ORM\SoftDeletable\SoftDeletableSubscriber;
 use Knp\DoctrineBehaviors\ORM\Timestampable\TimestampableSubscriber;
 use Knp\DoctrineBehaviors\ORM\Translatable\TranslatableSubscriber;
 use Knp\DoctrineBehaviors\ORM\Tree\TreeSubscriber;
-use Nette;
 use Nette\DI\Container;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zenify;
 use Zenify\DoctrineBehaviors\Tests\ContainerFactory;
 
 
-class DoctrineBehaviorsExtensionTest extends PHPUnit_Framework_TestCase
+class DoctrineBehaviorsExtensionTest extends TestCase
 {
 
 	/**

@@ -2,12 +2,12 @@
 
 namespace Zenify\DoctrineBehaviors\Tests\Translatable\Entities\Attributes;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zenify\DoctrineBehaviors\Tests\Translatable\Entities\Attributes\Source\TranslatableEntity;
 use Zenify\DoctrineBehaviors\Tests\Translatable\Entities\Attributes\Source\TranslatableEntityWithNetteObject;
 
 
-final class TranslatableTest extends PHPUnit_Framework_TestCase
+final class TranslatableTest extends TestCase
 {
 
 	public function testGetterMethod()

@@ -8,10 +8,10 @@
 namespace Zenify\DoctrineBehaviors\DI;
 
 use Knp\DoctrineBehaviors\Reflection\ClassAnalyzer;
-use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
+use Nette\DI\Config\Processor;
 use Nette\DI\ServiceDefinition;
-use Nette\DI\Statement;
+use Nette\DI\Definitions\Statement;
 
 
 abstract class AbstractBehaviorExtension extends CompilerExtension
@@ -29,7 +29,7 @@ abstract class AbstractBehaviorExtension extends CompilerExtension
 		}
 
 		return $builder->addDefinition('knp.classAnalyzer')
-			->setClass(ClassAnalyzer::class);
+			->setType(ClassAnalyzer::class);
 	}
 
 
@@ -46,11 +46,11 @@ abstract class AbstractBehaviorExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$definition = $builder->addDefinition($this->prefix(md5($callable)));
 
-		list($definition->factory) = Compiler::filterArguments([
+		list($definition->factory) = Processor::processArguments([
 			is_string($callable) ? new Statement($callable) : $callable
 		]);
 
-		list($resolverClass) = (array) $builder->normalizeEntity($definition->getFactory()->getEntity());
+		list($resolverClass) = (array) $definition->getFactory()->getEntity();
 		if (class_exists($resolverClass)) {
 			$definition->setClass($resolverClass);
 		}

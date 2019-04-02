@@ -10,6 +10,7 @@ namespace Zenify\DoctrineBehaviors\DI;
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\Model\Sluggable\Sluggable;
 use Knp\DoctrineBehaviors\ORM\Sluggable\SluggableSubscriber;
+use Nette\DI\Config\Helpers;
 use Nette\Utils\AssertionException;
 use Nette\Utils\Validators;
 
@@ -28,13 +29,14 @@ final class SluggableExtension extends AbstractBehaviorExtension
 
 	public function loadConfiguration()
 	{
-		$config = $this->getConfig($this->default);
+		$config = Helpers::merge($this->getConfig(), $this->default);
 		$this->validateConfigTypes($config);
 		$builder = $this->getContainerBuilder();
 
 		$builder->addDefinition($this->prefix('listener'))
-			->setClass(SluggableSubscriber::class, [
-				'@' . $this->getClassAnalyzer()->getClass(),
+			->setType(SluggableSubscriber::class)
+			->setArguments([
+				'@' . $this->getClassAnalyzer()->getType(),
 				$config['isRecursive'],
 				$config['trait']
 			])

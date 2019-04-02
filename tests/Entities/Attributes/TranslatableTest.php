@@ -3,10 +3,10 @@
 namespace Zenify\DoctrineBehaviors\Tests\Entities\Source;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
 
-class TranslatableTest extends PHPUnit_Framework_TestCase
+class TranslatableTest extends TestCase
 {
 
 	public function testGetMethod()

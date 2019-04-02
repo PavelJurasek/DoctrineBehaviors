@@ -2,12 +2,12 @@
 
 namespace Zenify\DoctrineBehaviors\Tests\Loggable;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Zenify\DoctrineBehaviors\Contract\Loggable\LoggerInterface;
 use Zenify\DoctrineBehaviors\Loggable\LoggerCallable;
 
 
-class LoggerCallableTest extends PHPUnit_Framework_TestCase
+class LoggerCallableTest extends TestCase
 {
 
 	/**
@@ -21,7 +21,7 @@ class LoggerCallableTest extends PHPUnit_Framework_TestCase
 	private $loggerCallable;
 
 
-	protected function setUp()
+	protected function setUp(): void
 	{
 		$loggerMock = $this->prophesize(LoggerInterface::class);
 		$that = $this;

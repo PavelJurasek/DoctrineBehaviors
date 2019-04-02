@@ -10,6 +10,7 @@ namespace Zenify\DoctrineBehaviors\DI;
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\Model\Tree\Node;
 use Knp\DoctrineBehaviors\ORM\Tree\TreeSubscriber;
+use Nette\DI\Config\Helpers;
 use Nette\Utils\AssertionException;
 use Nette\Utils\Validators;
 
@@ -31,13 +32,14 @@ final class TreeExtension extends AbstractBehaviorExtension
 	 */
 	public function loadConfiguration()
 	{
-		$config = $this->getConfig($this->default);
+		$config = Helpers::merge($this->getConfig(), $this->default);
 		$this->validateConfigTypes($config);
 		$builder = $this->getContainerBuilder();
 
 		$builder->addDefinition($this->prefix('listener'))
-			->setClass(TreeSubscriber::class, [
-				'@' . $this->getClassAnalyzer()->getClass(),
+			->setType(TreeSubscriber::class)
+			->setArguments([
+				'@' . $this->getClassAnalyzer()->getType(),
 				$config['isRecursive'],
 				$config['nodeTrait']
 			])

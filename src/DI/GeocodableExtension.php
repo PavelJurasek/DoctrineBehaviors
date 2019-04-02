@@ -10,6 +10,7 @@ namespace Zenify\DoctrineBehaviors\DI;
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\Model\Geocodable\Geocodable;
 use Knp\DoctrineBehaviors\ORM\Geocodable\GeocodableSubscriber;
+use Nette\DI\Config\Helpers;
 use Nette\Utils\AssertionException;
 use Nette\Utils\Validators;
 
@@ -32,18 +33,19 @@ final class GeocodableExtension extends AbstractBehaviorExtension
 	 */
 	public function loadConfiguration()
 	{
-		$config = $this->getConfig($this->default);
+		$config = Helpers::merge($this->getConfig(), $this->default);
 		$this->validateConfigTypes($config);
 		$builder = $this->getContainerBuilder();
 
 		$geolocationCallable = $this->buildDefinitionFromCallable($config['geolocationCallable']);
 
 		$builder->addDefinition($this->prefix('listener'))
-			->setClass(GeocodableSubscriber::class, [
-				'@' . $this->getClassAnalyzer()->getClass(),
+			->setType(GeocodableSubscriber::class)
+			->setArguments([
+				'@' . $this->getClassAnalyzer()->getType(),
 				$config['isRecursive'],
 				$config['trait'],
-				$geolocationCallable ? '@' . $geolocationCallable->getClass() : $geolocationCallable
+				$geolocationCallable ? '@' . $geolocationCallable->getType() : $geolocationCallable
 			])
 			->setAutowired(FALSE)
 			->addTag(EventsExtension::TAG_SUBSCRIBER);

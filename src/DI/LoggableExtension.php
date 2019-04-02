@@ -9,6 +9,7 @@ namespace Zenify\DoctrineBehaviors\DI;
 
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\ORM\Loggable\LoggableSubscriber;
+use Nette\DI\Config\Helpers;
 use Nette\Utils\AssertionException;
 use Nette\Utils\Validators;
 use Zenify\DoctrineBehaviors\Loggable\LoggerCallable;
@@ -31,17 +32,18 @@ final class LoggableExtension extends AbstractBehaviorExtension
 	 */
 	public function loadConfiguration()
 	{
-		$config = $this->getConfig($this->default);
+		$config = Helpers::merge($this->getConfig(), $this->default);
 		$this->validateConfigTypes($config);
 		$builder = $this->getContainerBuilder();
 
 		$loggerCallable = $this->buildDefinitionFromCallable($config['loggerCallable']);
 
 		$builder->addDefinition($this->prefix('listener'))
-			->setClass(LoggableSubscriber::class, [
-				'@' . $this->getClassAnalyzer()->getClass(),
+			->setType(LoggableSubscriber::class)
+			->setArguments([
+				'@' . $this->getClassAnalyzer()->getType(),
 				$config['isRecursive'],
-				'@' . $loggerCallable->getClass()
+				'@' . $loggerCallable->getType()
 			])
 			->setAutowired(FALSE)
 			->addTag(EventsExtension::TAG_SUBSCRIBER);

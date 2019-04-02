@@ -10,6 +10,7 @@ namespace Zenify\DoctrineBehaviors\DI;
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\Model\Blameable\Blameable;
 use Knp\DoctrineBehaviors\ORM\Blameable\BlameableSubscriber;
+use Nette\DI\Config\Helpers;
 use Nette\Utils\AssertionException;
 use Nette\Utils\Validators;
 use Zenify\DoctrineBehaviors\Blameable\UserCallable;
@@ -34,18 +35,19 @@ final class BlameableExtension extends AbstractBehaviorExtension
 	 */
 	public function loadConfiguration()
 	{
-		$config = $this->getConfig($this->default);
+		$config = Helpers::merge($this->getConfig(), $this->default);
 		$this->validateConfigTypes($config);
 		$builder = $this->getContainerBuilder();
 
 		$userCallable = $this->buildDefinitionFromCallable($config['userCallable']);
 
 		$builder->addDefinition($this->prefix('listener'))
-			->setClass(BlameableSubscriber::class, [
-				'@' . $this->getClassAnalyzer()->getClass(),
+			->setType(BlameableSubscriber::class)
+			->setArguments([
+				'@' . $this->getClassAnalyzer()->getType(),
 				$config['isRecursive'],
 				$config['trait'],
-				'@' . $userCallable->getClass(),
+				'@' . $userCallable->getType(),
 				$config['userEntity']
 			])
 			->setAutowired(FALSE)
