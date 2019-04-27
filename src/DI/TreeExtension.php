@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of Zenify
@@ -10,9 +10,8 @@ namespace Zenify\DoctrineBehaviors\DI;
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\Model\Tree\Node;
 use Knp\DoctrineBehaviors\ORM\Tree\TreeSubscriber;
-use Nette\DI\Config\Helpers;
-use Nette\Utils\AssertionException;
-use Nette\Utils\Validators;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 
 
 final class TreeExtension extends AbstractBehaviorExtension
@@ -32,8 +31,7 @@ final class TreeExtension extends AbstractBehaviorExtension
 	 */
 	public function loadConfiguration()
 	{
-		$config = Helpers::merge($this->getConfig(), $this->default);
-		$this->validateConfigTypes($config);
+		$config = (array) $this->getConfig();
 		$builder = $this->getContainerBuilder();
 
 		$builder->addDefinition($this->prefix('listener'))
@@ -48,13 +46,12 @@ final class TreeExtension extends AbstractBehaviorExtension
 	}
 
 
-	/**
-	 * @throws AssertionException
-	 */
-	private function validateConfigTypes(array $config)
+	public function getConfigSchema(): Schema
 	{
-		Validators::assertField($config, 'isRecursive', 'bool');
-		Validators::assertField($config, 'nodeTrait', 'type');
+		return Expect::structure([
+			'isRecursive' => Expect::bool(TRUE),
+			'nodeTrait' => Expect::string(Node::class),
+		]);
 	}
 
 }

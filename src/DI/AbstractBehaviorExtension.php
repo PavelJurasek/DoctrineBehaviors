@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of Zenify
@@ -9,7 +9,7 @@ namespace Zenify\DoctrineBehaviors\DI;
 
 use Knp\DoctrineBehaviors\Reflection\ClassAnalyzer;
 use Nette\DI\CompilerExtension;
-use Nette\DI\Config\Processor;
+use Nette\DI\Helpers;
 use Nette\DI\ServiceDefinition;
 use Nette\DI\Definitions\Statement;
 
@@ -46,7 +46,7 @@ abstract class AbstractBehaviorExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$definition = $builder->addDefinition($this->prefix(md5($callable)));
 
-		list($definition->factory) = Processor::processArguments([
+		list($definition->factory) = Helpers::filterArguments([
 			is_string($callable) ? new Statement($callable) : $callable
 		]);
 

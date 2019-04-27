@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of Zenify
@@ -11,30 +11,19 @@ use Kdyby;
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\Model\SoftDeletable\SoftDeletable;
 use Knp\DoctrineBehaviors\ORM\SoftDeletable\SoftDeletableSubscriber;
-use Nette\DI\Config\Helpers;
-use Nette\Utils\AssertionException;
-use Nette\Utils\Validators;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 
 
 final class SoftDeletableExtension extends AbstractBehaviorExtension
 {
 
 	/**
-	 * @var array
-	 */
-	private $default = [
-		'isRecursive' => TRUE,
-		'trait' => SoftDeletable::class
-	];
-
-
-	/**
 	 * {@inheritdoc}
 	 */
 	public function loadConfiguration()
 	{
-		$config = Helpers::merge($this->getConfig(), $this->default);
-		$this->validateConfigTypes($config);
+		$config = (array) $this->getConfig();
 		$builder = $this->getContainerBuilder();
 
 		$builder->addDefinition($this->prefix('listener'))
@@ -49,13 +38,12 @@ final class SoftDeletableExtension extends AbstractBehaviorExtension
 	}
 
 
-	/**
-	 * @throws AssertionException
-	 */
-	private function validateConfigTypes(array $config)
+	public function getConfigSchema(): Schema
 	{
-		Validators::assertField($config, 'isRecursive', 'bool');
-		Validators::assertField($config, 'trait', 'type');
+		return Expect::structure([
+			'isRecursive' => Expect::bool(TRUE),
+			'trait' => Expect::string(SoftDeletable::class)
+		]);
 	}
 
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of Zenify
@@ -9,9 +9,8 @@ namespace Zenify\DoctrineBehaviors\DI;
 
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\ORM\Loggable\LoggableSubscriber;
-use Nette\DI\Config\Helpers;
-use Nette\Utils\AssertionException;
-use Nette\Utils\Validators;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 use Zenify\DoctrineBehaviors\Loggable\LoggerCallable;
 
 
@@ -19,21 +18,11 @@ final class LoggableExtension extends AbstractBehaviorExtension
 {
 
 	/**
-	 * @var array
-	 */
-	private $default = [
-		'isRecursive' => TRUE,
-		'loggerCallable' => LoggerCallable::class
-	];
-
-
-	/**
 	 * {@inheritdoc}
 	 */
 	public function loadConfiguration()
 	{
-		$config = Helpers::merge($this->getConfig(), $this->default);
-		$this->validateConfigTypes($config);
+		$config = (array) $this->getConfig();
 		$builder = $this->getContainerBuilder();
 
 		$loggerCallable = $this->buildDefinitionFromCallable($config['loggerCallable']);
@@ -50,13 +39,12 @@ final class LoggableExtension extends AbstractBehaviorExtension
 	}
 
 
-	/**
-	 * @throws AssertionException
-	 */
-	private function validateConfigTypes(array $config)
+	public function getConfigSchema(): Schema
 	{
-		Validators::assertField($config, 'isRecursive', 'bool');
-		Validators::assertField($config, 'loggerCallable', 'type');
+		return Expect::structure([
+			'isRecursive' => Expect::bool(TRUE),
+			'loggerCallable' => Expect::string(LoggerCallable::class)
+		]);
 	}
 
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of Zenify
@@ -10,9 +10,8 @@ namespace Zenify\DoctrineBehaviors\DI;
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\Model\Blameable\Blameable;
 use Knp\DoctrineBehaviors\ORM\Blameable\BlameableSubscriber;
-use Nette\DI\Config\Helpers;
-use Nette\Utils\AssertionException;
-use Nette\Utils\Validators;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 use Zenify\DoctrineBehaviors\Blameable\UserCallable;
 
 
@@ -20,23 +19,11 @@ final class BlameableExtension extends AbstractBehaviorExtension
 {
 
 	/**
-	 * @var array
-	 */
-	private $default = [
-		'isRecursive' => TRUE,
-		'trait' => Blameable::class,
-		'userCallable' => UserCallable::class,
-		'userEntity' => NULL
-	];
-
-
-	/**
 	 * {@inheritdoc}
 	 */
 	public function loadConfiguration()
 	{
-		$config = Helpers::merge($this->getConfig(), $this->default);
-		$this->validateConfigTypes($config);
+		$config = (array) $this->getConfig();
 		$builder = $this->getContainerBuilder();
 
 		$userCallable = $this->buildDefinitionFromCallable($config['userCallable']);
@@ -55,15 +42,14 @@ final class BlameableExtension extends AbstractBehaviorExtension
 	}
 
 
-	/**
-	 * @throws AssertionException
-	 */
-	private function validateConfigTypes(array $config)
+	public function getConfigSchema(): Schema
 	{
-		Validators::assertField($config, 'isRecursive', 'bool');
-		Validators::assertField($config, 'trait', 'type');
-		Validators::assertField($config, 'userCallable', 'string');
-		Validators::assertField($config, 'userEntity', 'null|string');
+		return Expect::structure([
+			'isRecursive' => Expect::bool(TRUE),
+			'trait' => Expect::string(Blameable::class),
+			'userCallable' => Expect::string(UserCallable::class),
+			'userEntity' => Expect::string(),
+		]);
 	}
 
 }

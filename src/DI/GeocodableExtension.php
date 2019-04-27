@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of Zenify
@@ -10,31 +10,19 @@ namespace Zenify\DoctrineBehaviors\DI;
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\Model\Geocodable\Geocodable;
 use Knp\DoctrineBehaviors\ORM\Geocodable\GeocodableSubscriber;
-use Nette\DI\Config\Helpers;
-use Nette\Utils\AssertionException;
-use Nette\Utils\Validators;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 
 
 final class GeocodableExtension extends AbstractBehaviorExtension
 {
 
 	/**
-	 * @var array
-	 */
-	private $default = [
-		'isRecursive' => TRUE,
-		'trait' => Geocodable::class,
-		'geolocationCallable' => NULL
-	];
-
-
-	/**
 	 * {@inheritdoc}
 	 */
 	public function loadConfiguration()
 	{
-		$config = Helpers::merge($this->getConfig(), $this->default);
-		$this->validateConfigTypes($config);
+		$config = (array) $this->getConfig();
 		$builder = $this->getContainerBuilder();
 
 		$geolocationCallable = $this->buildDefinitionFromCallable($config['geolocationCallable']);
@@ -52,14 +40,13 @@ final class GeocodableExtension extends AbstractBehaviorExtension
 	}
 
 
-	/**
-	 * @throws AssertionException
-	 */
-	private function validateConfigTypes(array $config)
+	public function getConfigSchema(): Schema
 	{
-		Validators::assertField($config, 'isRecursive', 'bool');
-		Validators::assertField($config, 'trait', 'type');
-		Validators::assertField($config, 'geolocationCallable', 'null|type');
+		return Expect::structure([
+			'isRecursive' => Expect::bool(TRUE),
+			'trait' => Expect::string(Geocodable::class),
+			'geolocationCallable' => Expect::type('type')->nullable(),
+		]);
 	}
 
 }

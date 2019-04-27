@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of Zenify
@@ -11,9 +11,8 @@ use Kdyby;
 use Kdyby\Events\DI\EventsExtension;
 use Knp\DoctrineBehaviors\Model\Translatable\Translation;
 use Knp\DoctrineBehaviors\ORM\Translatable\TranslatableSubscriber;
-use Nette\DI\Config\Helpers;
-use Nette\Utils\AssertionException;
-use Nette\Utils\Validators;
+use Nette\Schema\Expect;
+use Nette\Schema\Schema;
 use Zenify\DoctrineBehaviors\Entities\Attributes\Translatable;
 
 
@@ -21,25 +20,11 @@ final class TranslatableExtension extends AbstractBehaviorExtension
 {
 
 	/**
-	 * @var array
-	 */
-	private $default = [
-		'currentLocaleCallable' => NULL,
-		'defaultLocaleCallable' => NULL,
-		'translatableTrait' => Translatable::class,
-		'translationTrait' => Translation::class,
-		'translatableFetchMode' => 'LAZY',
-		'translationFetchMode' => 'LAZY',
-	];
-
-
-	/**
 	 * {@inheritdoc}
 	 */
 	public function loadConfiguration()
 	{
-		$config = Helpers::merge($this->getConfig(), $this->default);
-		$this->validateConfigTypes($config);
+		$config = (array) $this->getConfig();
 		$builder = $this->getContainerBuilder();
 
 		$builder->addDefinition($this->prefix('listener'))
@@ -58,16 +43,16 @@ final class TranslatableExtension extends AbstractBehaviorExtension
 	}
 
 
-	/**
-	 * @throws AssertionException
-	 */
-	private function validateConfigTypes(array $config)
+	public function getConfigSchema(): Schema
 	{
-		Validators::assertField($config, 'currentLocaleCallable', 'null|array');
-		Validators::assertField($config, 'translatableTrait', 'type');
-		Validators::assertField($config, 'translationTrait', 'type');
-		Validators::assertField($config, 'translatableFetchMode', 'string');
-		Validators::assertField($config, 'translationFetchMode', 'string');
+		return Expect::structure([
+			'currentLocaleCallable' => Expect::array()->nullable(),
+			'defaultLocaleCallable' => Expect::string(),
+			'translatableTrait' => Expect::string(Translatable::class),
+			'translationTrait' => Expect::string(Translation::class),
+			'translatableFetchMode' => Expect::string('LAZY'),
+			'translationFetchMode' => Expect::string('LAZY'),
+		]);
 	}
 
 }
